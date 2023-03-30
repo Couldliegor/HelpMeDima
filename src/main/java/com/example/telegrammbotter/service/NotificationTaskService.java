@@ -1,4 +1,4 @@
-package com.example.telegrammbotter.Service;
+package com.example.telegrammbotter.service;
 
 import com.example.telegrammbotter.Repository.NotificationTaskRepository;
 import com.example.telegrammbotter.entity.NotificationTask;

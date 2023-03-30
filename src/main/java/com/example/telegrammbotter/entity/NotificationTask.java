@@ -1,9 +1,6 @@
 package com.example.telegrammbotter.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Enabled;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 
@@ -12,14 +9,24 @@ import java.time.LocalDateTime;
 public class NotificationTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(nullable = false, name = "id")
     private long id;
-    @Column(name = "message")
+    @Column(nullable = false, name = "message")
     private String message;
-    @Column(name = "chat_id")
+    @Column(nullable = false, name = "chat_id")
     private long chatId;
-    @Column(name  = "notification_time")
+    @Column(nullable = false, name  = "notification_date_time")
     private LocalDateTime notificationDateTime;
+
+    public NotificationTask(String message, long chatId, LocalDateTime notificationDateTime) {
+        this.message = message;
+        this.chatId = chatId;
+        this.notificationDateTime = notificationDateTime;
+    }
+
+    public NotificationTask() {
+
+    }
 
     public long getId() {
         return id;

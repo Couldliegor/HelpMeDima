@@ -1,6 +1,6 @@
 package com.example.telegrammbotter.listener;
 
-import com.example.telegrammbotter.Service.NotificationTaskService;
+import com.example.telegrammbotter.service.NotificationTaskService;
 import com.example.telegrammbotter.entity.NotificationTask;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -26,10 +26,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final NotificationTaskService notificationTaskService;
-    private final Pattern pattern = Pattern.compile("" +
-                                                    "3(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2}) " +
-                                                    "([А - я\\d\\s.,!?:]+ )" +
-                                                    "");
+    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2})\\s+([А-я\\d\\s.,!?:]+)");
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     public TelegramBotUpdatesListener(TelegramBot telegramBot, NotificationTaskService notificationTaskService) {
         this.telegramBot = telegramBot;
@@ -44,8 +41,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         try {
-            updates.forEach(update -> {
-                logger.info("Hadles update: {}", update); //логгеры можно конфигурировать
+            updates.stream().filter(update  -> update.message() != null)
+            .forEach(update -> {
+                logger.info("Handles update: {}", update); //логгеры можно конфигурировать
                 Message message = update.message();
                 Long chatId = message.from().id();
                 String text = message.text();
@@ -62,10 +60,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         } else {
                             String txt = matcher.group(2);
                             NotificationTask notificationTask = new NotificationTask();
-                            notificationTask.setId(chatId);
+                            notificationTask.setChatId(chatId);
                             notificationTask.setMessage(txt);
                             notificationTask.setNotificationDateTime(dataTime);
                             notificationTaskService.save(notificationTask);
+                            sendMessage(chatId, "Задача успешно запланирована!");
                         }
                     } else {
                         sendMessage(chatId, "Некорректный формат сообщения");
